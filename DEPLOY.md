@@ -33,9 +33,10 @@ Notes:
   Using plain `application/javascript` makes Cloudflare parse the file as a
   classic service worker and reject it with `SyntaxError: Unexpected token
   'export'`.
-- `_worker.js` is ~5 MB (~1.07 MB gzipped). That is just over the 1 MB free-plan
-  compressed limit, but the upload is accepted; if a future release grows past
-  the limit, use Workers Paid or deploy via Pages instead.
+- `_worker.js` is slim (~316 KB raw, ~76 KB gzipped), comfortably under the
+  1 MB free-plan compressed limit. An earlier version carried ~4.8 MB of inert
+  filler text in a trailing comment; that has been removed — it had no effect
+  on behavior.
 
 ## Step 2 — Create and bind a KV namespace named `KV` (required)
 
@@ -114,6 +115,37 @@ clear JSON error instead of the disguise page:
 ```json
 {"error":"KV_NOT_BOUND","message":"KV namespace 'KV' is not bound — bind a KV namespace named KV to enable subscription and admin panel"}
 ```
+
+## Custom preferred IPs (`CUSTOM_IPS`, optional)
+
+The subscription normally serves IPs drawn at random from the carrier CIDR
+list for the **auto-detected** carrier (Cloudflare's `request.cf` data decides
+ct / cu / cmcc / cf; a `?cnIspCode=` query parameter can override it). That
+list is static and may not match the IPs that are actually fastest on your
+local network.
+
+To plug in IPs you measured yourself, set a plain-text variable named
+`CUSTOM_IPS` (comma-separated, each entry an IP with an optional port):
+
+```
+CUSTOM_IPS = 1.2.3.4:443,5.6.7.8:2083,9.10.11.12
+```
+
+- Entries without a port default to `443`. An entry may carry its own `#remark`
+  (e.g. `1.2.3.4:443#my-best-ip`); without one it is labelled `自定义优选N`.
+- When set, the subscription **adds** these as extra nodes alongside the
+  auto-detected carrier nodes — same host/SNI/path/fingerprint as the others.
+- When unset, the subscription behaves exactly as before (auto-detected
+  carrier list only).
+- Nothing about a region or ISP is baked into this: the code never forces a
+  carrier. The auto-detection keeps working from whatever local network the
+  Worker is reached from, so the same deployment still works if you move or
+  change ISP — just re-measure and update `CUSTOM_IPS`.
+
+Set it like any other variable — add
+`{"type":"plain_text","name":"CUSTOM_IPS","text":"<your-list>"}` to the
+upload metadata, or add it in the dashboard under the Worker's Settings →
+Variables. A re-deploy is needed for the change to take effect.
 
 ## Quick checklist
 
