@@ -500,6 +500,7 @@ export default {
 					if (authCookie && authCookie == await MD5MD5(UA + 加密秘钥 + 管理员密码)) return fetch(new Request('https://speed.cloudflare.com/locations', { headers: { 'Referer': 'https://speed.cloudflare.com/' } }));
 				} else if (访问路径 === 'robots.txt') return new Response('User-agent: *\nDisallow: /', { status: 200, headers: { 'Content-Type': 'text/plain; charset=UTF-8' } });
 			} else if (!envUUID) return fetch(Pages静态页面 + '/noKV').then(r => { const headers = new Headers(r.headers); headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate'); headers.set('Pragma', 'no-cache'); headers.set('Expires', '0'); return new Response(r.body, { status: 404, statusText: r.statusText, headers }) });
+			else if ((url.pathname.slice(1) === 加密秘钥 && 加密秘钥 !== '勿动此默认密钥，有需求请自行通过添加变量KEY进行修改') || 访问路径 === 'admin' || 访问路径.startsWith('admin/') || 访问路径 === 'login' || 访问路径 === 'sub') return new Response(JSON.stringify({ error: 'KV_NOT_BOUND', message: "KV namespace 'KV' is not bound — bind a KV namespace named KV to enable subscription and admin panel" }), { status: 503, headers: { 'Content-Type': 'application/json;charset=utf-8' } });
 		}
 
 		let 伪装页URL = env.URL || 'nginx';
