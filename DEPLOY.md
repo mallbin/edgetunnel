@@ -160,6 +160,15 @@ or bindings were changed. So a flagged service cannot be recovered by
 re-deploying code to it — use a fresh service name (delete and recreate the
 service, or pick a new name) and re-bind the custom domain.
 
+**Root cause found 2026-11-09:** on this account, a *static* import of
+`cloudflare:sockets` (`import { connect } from "cloudflare:sockets"`) is what
+gets a service flagged with 1101. Load it *dynamically at runtime* instead
+(`const { connect } = await import("cloudflare:sockets")` inside the async
+handler) and the same code loads clean — verified by fetching baidu through
+the Worker (HTTP 200). This is why every edgetunnel version with a static
+import failed. `_worker.minimal.js` now uses the dynamic import; never put the
+static import back.
+
 When the full build keeps getting flagged, use the minimal build instead:
 `_worker.minimal.js` is a ~9 KB VLESS-over-WebSocket proxy with a lightweight
 `/sub` subscription endpoint (4 nodes, `fp=chrome`). It has no KV binding, no

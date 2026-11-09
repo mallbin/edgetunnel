@@ -12,7 +12,9 @@ var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
 // src/index.js
-import { connect } from "cloudflare:sockets";
+// NOTE (2026-11-09): do NOT statically import "cloudflare:sockets" — on this
+// account a static import gets the service Error 1101. Load it dynamically
+// at runtime inside startRemote() instead; that loads clean.
 var UUID_STR = "00000000-0000-4000-8000-000000000000";
 var WS_PATH = "/59829528aac48b2e8bd8d1cce9aafd28";
 var MAX_REPLAY_BYTES = 64 * 1024;
@@ -101,7 +103,7 @@ var index_default = {
     }
     if (url.pathname === "/sub") {
       const host = url.hostname;
-      const ips = ["108.162.192.1", "172.66.0.1", "103.21.244.1"];
+      const ips = ["104.16.0.1", "172.66.0.1", "104.17.128.16"];
       const links = ips.map((ip, i) => {
         return "vless://" + UUID_STR + "@" + ip + ":2083?encryption=none&security=tls&sni=" + host + "&fp=chrome&type=ws&host=" + host + "&path=%2F59829528aac48b2e8bd8d1cce9aafd28#node-" + (i + 1);
       });
@@ -147,6 +149,9 @@ var index_default = {
     const startRemote = /* @__PURE__ */ __name(async () => {
       if (!destination || clientClosed) return;
       const currentGeneration = ++generation;
+      // Dynamic import: a static `import { connect } from "cloudflare:sockets"`
+      // gets this account Error 1101; runtime loading works (verified 2026-11-09).
+      const { connect } = await import("cloudflare:sockets");
       const socket = connect(
         { hostname: destination.hostname, port: destination.port },
         { secureTransport: "off", allowHalfOpen: false }
