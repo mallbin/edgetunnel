@@ -14,7 +14,7 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 // src/index.js
 import { connect } from "cloudflare:sockets";
 var UUID_STR = "00000000-0000-4000-8000-000000000000";
-var WS_PATH = "/";
+var WS_PATH = "/59829528aac48b2e8bd8d1cce9aafd28";
 var MAX_REPLAY_BYTES = 64 * 1024;
 var MAX_CONNECT_RETRIES = 2;
 var UUID_BYTES = new Uint8Array(16);
@@ -103,9 +103,9 @@ var index_default = {
       const host = url.hostname;
       const ips = ["108.162.192.1", "172.66.0.1", "103.21.244.1"];
       const links = ips.map((ip, i) => {
-        return "vless://" + UUID_STR + "@" + ip + ":2083?encryption=none&security=tls&sni=" + host + "&fp=chrome&type=ws&host=" + host + "&path=%2F#node-" + (i + 1);
+        return "vless://" + UUID_STR + "@" + ip + ":2083?encryption=none&security=tls&sni=" + host + "&fp=chrome&type=ws&host=" + host + "&path=%2F59829528aac48b2e8bd8d1cce9aafd28#node-" + (i + 1);
       });
-      links.push("vless://" + UUID_STR + "@" + host + ":443?encryption=none&security=tls&sni=" + host + "&fp=chrome&type=ws&host=" + host + "&path=%2F#node-host");
+      links.push("vless://" + UUID_STR + "@" + host + ":443?encryption=none&security=tls&sni=" + host + "&fp=chrome&type=ws&host=" + host + "&path=%2F59829528aac48b2e8bd8d1cce9aafd28#node-host");
       return new Response(links.join("\n"), { status: 200, headers: { "Content-Type": "text/plain;charset=utf-8" } });
     }
     if (url.pathname !== WS_PATH) {
