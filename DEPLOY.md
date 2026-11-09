@@ -147,6 +147,29 @@ Set it like any other variable — add
 upload metadata, or add it in the dashboard under the Worker's Settings →
 Variables. A re-deploy is needed for the change to take effect.
 
+## If the Worker returns Error 1101 (service blocked)
+
+Error 1101 on every path — including a plain hello-world script — means the
+**service itself is blocked on the account**, not the code. This was verified
+2026-11-08: a minimal hello-world deployed to `edgetunnel-test` still returned
+1101, while the same hello-world, a minimal VLESS proxy, and the full
+`_worker.js` (without bindings) all returned 200/404 on a fresh service name.
+Deploying the full build **with** UUID/KEY/KV bindings to a fresh service
+made that service return 1101 too, and it stayed blocked even after the code
+or bindings were changed. So a flagged service cannot be recovered by
+re-deploying code to it — use a fresh service name (delete and recreate the
+service, or pick a new name) and re-bind the custom domain.
+
+When the full build keeps getting flagged, use the minimal build instead:
+`_worker.minimal.js` is a ~9 KB VLESS-over-WebSocket proxy with a lightweight
+`/sub` subscription endpoint (4 nodes, `fp=chrome`). It has no KV binding, no
+admin panel, and no env vars. Verified 2026-11-08 on a fresh service: `/`
+returns 200 `ok` and `/sub` returns 200 with 4 `vless://` links.
+
+Deploy it like the full build but simpler — replace the placeholder UUID in
+the file with your own UUIDv4 first, upload as `application/javascript+module`,
+then enable the `workers.dev` subdomain (Step 3). No KV, no UUID/KEY vars.
+
 ## Quick checklist
 
 1. [ ] Script uploaded with `UUID` + `KEY` vars (ES-module content type).
